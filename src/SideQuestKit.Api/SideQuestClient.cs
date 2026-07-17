@@ -54,4 +54,11 @@ public sealed class SideQuestClient
 
         return "NOT_IMPLEMENTED";
     }
+
+    public async Task<CreateUploadResponse> CreateUploadAsync(FileInfo apk)
+    {
+        await Task.Delay(100);
+
+        return new CreateUploadResponse();
+    }
 }

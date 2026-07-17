@@ -72,13 +72,12 @@ public static class PublishCommand
             Console.WriteLine(
                 "[2/4] Uploading APK...");
 
-            var fileId =
-                await client.UploadApkAsync(
-                    token.AccessToken,
+            var upload =
+                await client.CreateUploadAsync(
                     apk);
 
             Console.WriteLine(
-                $"OK (FileId: {fileId})");
+                $"OK (FileId: {upload.FileId})");
         });
 
         return command;
