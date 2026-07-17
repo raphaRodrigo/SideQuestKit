@@ -1,3 +1,4 @@
+using SideQuestKit.Api;
 using System.CommandLine;
 
 namespace SideQuestKit.Cli.Commands;
@@ -11,33 +12,48 @@ public static class PublishCommand
                 "publish",
                 "Publishes an APK to SideQuest.");
 
-        command.Options.Add(
-            new Option<string>(
-                "--app-id")
+        var appIdOption =
+            new Option<string>("--app-id")
             {
                 Required = true
-            });
+            };
 
-        command.Options.Add(
-            new Option<FileInfo>(
-                "--apk")
+        var apkOption =
+            new Option<FileInfo>("--apk")
             {
                 Required = true
-            });
+            };
 
-        command.Options.Add(
-            new Option<string>(
-                "--refresh-token")
+        var refreshTokenOption =
+            new Option<string>("--refresh-token")
             {
                 Required = true
-            });
+            };
 
-        command.SetAction(
-            result =>
-            {
-                Console.WriteLine(
-                    "Publish command invoked.");
-            });
+        command.Options.Add(appIdOption);
+        command.Options.Add(apkOption);
+        command.Options.Add(refreshTokenOption);
+
+        command.SetAction(async parseResult =>
+        {
+            var refreshToken =
+                parseResult.GetValue(
+                    refreshTokenOption)!;
+
+            Console.WriteLine(
+                "[1/4] Refreshing access token...");
+
+            var client =
+                new SideQuestClient();
+
+            var token =
+                await client
+                    .RefreshTokenAsync(
+                        refreshToken);
+
+            Console.WriteLine(
+                $"Authenticated as {token.UsersId}");
+        });
 
         return command;
     }
