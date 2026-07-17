@@ -48,13 +48,13 @@ public static class PublishCommand
                 parseResult.GetValue(
                     refreshTokenOption)!;
 
-            if (!apk.Exists)
-            {
-                Console.Error.WriteLine(
-                    $"APK not found: {apk.FullName}");
+            //if (!apk.Exists)
+            //{
+            //    Console.Error.WriteLine(
+            //        $"APK not found: {apk.FullName}");
 
-                return;
-            }
+            //    return;
+            //}
 
             var client =
                 new SideQuestClient();
@@ -74,6 +74,7 @@ public static class PublishCommand
 
             var upload =
                 await client.CreateUploadAsync(
+                    token.AccessToken,
                     apk);
 
             Console.WriteLine(

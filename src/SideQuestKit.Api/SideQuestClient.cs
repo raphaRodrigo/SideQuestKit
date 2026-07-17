@@ -55,10 +55,45 @@ public sealed class SideQuestClient
         return "NOT_IMPLEMENTED";
     }
 
-    public async Task<CreateUploadResponse> CreateUploadAsync(FileInfo apk)
+    public async Task<CreateUploadResponse> CreateUploadAsync(
+    string accessToken,
+    FileInfo apk)
     {
-        await Task.Delay(100);
+        using var client =
+            new HttpClient();
 
-        return new CreateUploadResponse();
+        client.DefaultRequestHeaders.Authorization =
+            new System.Net.Http.Headers.AuthenticationHeaderValue(
+                "Bearer",
+                accessToken);
+
+        var payload = new
+        {
+            name = apk.Name,
+            size = apk.Length,
+            type = "apk"
+        };
+
+        var response =
+            await client.PostAsJsonAsync(
+                "https://cdn.sidequestvr.com/create-upload",
+                payload);
+
+        Console.WriteLine(
+            $"Status Code: {(int)response.StatusCode} {response.StatusCode}");
+
+        var responseBody =
+            await response.Content.ReadAsStringAsync();
+
+        Console.WriteLine(
+            responseBody);
+
+        response.EnsureSuccessStatusCode();
+
+        return System.Text.Json.JsonSerializer
+            .Deserialize<CreateUploadResponse>(
+                responseBody)
+            ?? throw new Exception(
+                "Failed to deserialize response.");
     }
 }
