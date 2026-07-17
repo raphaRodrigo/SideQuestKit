@@ -48,16 +48,7 @@ public sealed class SideQuestClient
                 "Failed to deserialize response.");
     }
 
-    public async Task<string> UploadApkAsync(string accessToken, FileInfo apk)
-    {
-        await Task.Delay(100);
-
-        return "NOT_IMPLEMENTED";
-    }
-
-    public async Task<CreateUploadResponse> CreateUploadAsync(
-    string accessToken,
-    FileInfo apk)
+    public async Task<CreateUploadResponse> CreateUploadAsync(string accessToken, FileInfo apk)
     {
         using var client =
             new HttpClient();
@@ -95,5 +86,34 @@ public sealed class SideQuestClient
                 responseBody)
             ?? throw new Exception(
                 "Failed to deserialize response.");
+    }
+
+    public async Task UploadFileAsync(string uploadUri, FileInfo apk)
+    {
+        await using var stream =
+            apk.OpenRead();
+
+        using var content =
+            new StreamContent(stream);
+
+        content.Headers.ContentType =
+            new System.Net.Http.Headers.MediaTypeHeaderValue(
+                "application/vnd.android.package-archive");
+
+        var response =
+            await _httpClient.PutAsync(
+                uploadUri,
+                content);
+
+        Console.WriteLine(
+            $"Status Code: {(int)response.StatusCode} {response.StatusCode}");
+
+        var responseBody =
+            await response.Content.ReadAsStringAsync();
+
+        Console.WriteLine(
+            responseBody);
+
+        response.EnsureSuccessStatusCode();
     }
 }

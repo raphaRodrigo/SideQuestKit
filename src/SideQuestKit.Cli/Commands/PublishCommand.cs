@@ -70,7 +70,7 @@ public static class PublishCommand
                 $"OK (User: {token.UsersId})");
 
             Console.WriteLine(
-                "[2/4] Uploading APK...");
+                "[2/4] Creating upload...");
 
             var upload =
                 await client.CreateUploadAsync(
@@ -79,6 +79,16 @@ public static class PublishCommand
 
             Console.WriteLine(
                 $"OK (FileId: {upload.FileId})");
+
+            Console.WriteLine(
+                "[3/4] Uploading APK...");
+
+            await client.UploadFileAsync(
+                upload.UploadUri,
+                apk);
+
+            Console.WriteLine(
+                "OK");
         });
 
         return command;
