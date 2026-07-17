@@ -36,23 +36,49 @@ public static class PublishCommand
 
         command.SetAction(async parseResult =>
         {
+            var appId =
+    parseResult.GetValue(
+        appIdOption)!;
+
+            var apk =
+                parseResult.GetValue(
+                    apkOption)!;
+
             var refreshToken =
                 parseResult.GetValue(
                     refreshTokenOption)!;
 
-            Console.WriteLine(
-                "[1/4] Refreshing access token...");
+            if (!apk.Exists)
+            {
+                Console.Error.WriteLine(
+                    $"APK not found: {apk.FullName}");
+
+                return;
+            }
 
             var client =
                 new SideQuestClient();
 
+            Console.WriteLine(
+                "[1/4] Refreshing access token...");
+
             var token =
-                await client
-                    .RefreshTokenAsync(
-                        refreshToken);
+                await client.RefreshTokenAsync(
+                    refreshToken);
 
             Console.WriteLine(
-                $"Authenticated as {token.UsersId}");
+                $"OK (User: {token.UsersId})");
+
+            Console.WriteLine(
+                "[2/4] Uploading APK...");
+
+            var fileId =
+                await client.UploadApkAsync(
+                    token.AccessToken,
+                    apk);
+
+            Console.WriteLine(
+                $"OK (FileId: {fileId})");
         });
 
         return command;

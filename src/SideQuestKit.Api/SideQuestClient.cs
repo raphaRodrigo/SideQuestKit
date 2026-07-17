@@ -17,9 +17,7 @@ public sealed class SideQuestClient
         };
     }
 
-    public async Task<TokenResponse>
-        RefreshTokenAsync(
-            string refreshToken)
+    public async Task<TokenResponse> RefreshTokenAsync(string refreshToken)
     {
         var content =
             new FormUrlEncodedContent(
@@ -48,5 +46,12 @@ public sealed class SideQuestClient
             .ReadFromJsonAsync<TokenResponse>()
             ?? throw new Exception(
                 "Failed to deserialize response.");
+    }
+
+    public async Task<string> UploadApkAsync(string accessToken, FileInfo apk)
+    {
+        await Task.Delay(100);
+
+        return "NOT_IMPLEMENTED";
     }
 }
