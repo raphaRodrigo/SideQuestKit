@@ -113,36 +113,26 @@ public static class PublishCommand
             Console.WriteLine(
                 "OK");
 
-            if (versionName is not null ||
-                versionCode is not null)
-            {
-                Console.WriteLine(
-                    "[4/5] Updating app metadata...");
+            Console.WriteLine(
+                "[4/5] Updating app metadata...");
 
-                var app =
-                    await client.GetAppAsync(
-                        token.AccessToken,
-                        appId);
-
-                if (versionName is not null)
-                {
-                    app.Versionname =
-                        versionName;
-                }
-
-                if (versionCode.HasValue)
-                {
-                    app.Versioncode =
-                        versionCode.Value;
-                }
-
-                await client.UpdateAppAsync(
+            var app =
+                await client.GetAppAsync(
                     token.AccessToken,
-                    app);
+                    appId);
 
-                Console.WriteLine(
-                    "OK");
-            }
+            app.Versionname =
+                versionName;
+
+            app.Versioncode =
+                versionCode.Value;
+
+            await client.UpdateAppAsync(
+                token.AccessToken,
+                app);
+
+            Console.WriteLine(
+                "OK");
 
             Console.WriteLine(
                 "[5/5] Associating APK with App...");
