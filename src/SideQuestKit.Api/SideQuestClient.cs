@@ -72,14 +72,9 @@ public sealed class SideQuestClient
                 "https://cdn.sidequestvr.com/create-upload",
                 payload);
 
-        Console.WriteLine(
-            $"Status Code: {(int)response.StatusCode} {response.StatusCode}");
-
         var responseBody =
             await response.Content.ReadAsStringAsync();
-
-        Console.WriteLine(
-            responseBody);
+            //await ConsoleLogResponse(response);
 
         response.EnsureSuccessStatusCode();
 
@@ -107,16 +102,28 @@ public sealed class SideQuestClient
                 uploadUri,
                 content);
 
-        Console.WriteLine(
-            $"Status Code: {(int)response.StatusCode} {response.StatusCode}");
-
-        var responseBody =
-            await response.Content.ReadAsStringAsync();
-
-        Console.WriteLine(
-            responseBody);
+        //await ConsoleLogResponse(response);
 
         response.EnsureSuccessStatusCode();
+    }
+
+    public async Task<AppResponse> GetAppAsync(string accessToken, string appId)
+    {
+        _httpClient.DefaultRequestHeaders.Authorization =
+            new AuthenticationHeaderValue(
+                "Bearer",
+                accessToken);
+
+        var response =
+            await _httpClient.GetAsync(
+                $"v2/developers/apps/{appId}");
+
+        response.EnsureSuccessStatusCode();
+
+        return await response.Content
+            .ReadFromJsonAsync<AppResponse>()
+            ?? throw new Exception(
+                "Failed to deserialize app.");
     }
 
     public async Task AssociateApkAsync(string accessToken, string appId, CreateUploadResponse upload)
@@ -153,15 +160,21 @@ public sealed class SideQuestClient
                 $"v2/developers/apps/{appId}/urls",
                 payload);
 
+        //await ConsoleLogResponse(response);
+
+        response.EnsureSuccessStatusCode();
+    }
+
+    private static async Task<string> ConsoleLogResponse(HttpResponseMessage response)
+    {
         Console.WriteLine(
             $"Status Code: {(int)response.StatusCode} {response.StatusCode}");
 
         var responseBody =
             await response.Content.ReadAsStringAsync();
 
-        Console.WriteLine(
-            responseBody);
+        Console.WriteLine(responseBody);
 
-        response.EnsureSuccessStatusCode();
+        return responseBody;
     }
 }

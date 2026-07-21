@@ -91,6 +91,20 @@ public static class PublishCommand
             Console.WriteLine(
                 "OK");
 
+            var app =
+                await client.GetAppAsync(
+                    token.AccessToken,
+                    appId);
+
+            Console.WriteLine(
+                $"{app.Name}");
+
+            Console.WriteLine(
+                $"{app.Versionname}");
+
+            Console.WriteLine(
+                $"{app.Versioncode}");
+
             Console.WriteLine(
                 "[4/4] Associating APK with App...");
 
