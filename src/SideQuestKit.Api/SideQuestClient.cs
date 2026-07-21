@@ -126,6 +126,21 @@ public sealed class SideQuestClient
                 "Failed to deserialize app.");
     }
 
+    public async Task UpdateAppAsync(string accessToken, AppResponse app)
+    {
+        _httpClient.DefaultRequestHeaders.Authorization =
+            new AuthenticationHeaderValue(
+                "Bearer",
+                accessToken);
+
+        var response =
+            await _httpClient.PatchAsJsonAsync(
+                $"v2/developers/apps/{app.AppsId}",
+                app);
+
+        response.EnsureSuccessStatusCode();
+    }
+
     public async Task AssociateApkAsync(string accessToken, string appId, CreateUploadResponse upload)
     {
         var fileUrl =
