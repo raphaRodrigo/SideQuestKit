@@ -30,9 +30,23 @@ public static class PublishCommand
                 Required = true
             };
 
+        var versionNameOption =
+            new Option<string>("--version-name")
+            {
+                Required = true
+            };
+
+        var versionCodeOption =
+            new Option<int?>("--version-code")
+            {
+                Required = true
+            };
+
         command.Options.Add(appIdOption);
         command.Options.Add(apkOption);
         command.Options.Add(refreshTokenOption);
+        command.Options.Add(versionNameOption);
+        command.Options.Add(versionCodeOption);
 
         command.SetAction(async parseResult =>
         {
@@ -48,6 +62,14 @@ public static class PublishCommand
                 parseResult.GetValue(
                     refreshTokenOption)!;
 
+            var versionName =
+                parseResult.GetValue(
+                    versionNameOption)!;
+
+            var versionCode =
+                parseResult.GetValue(
+                    versionCodeOption)!;
+
             if (!apk.Exists)
             {
                 Console.Error.WriteLine(
@@ -60,7 +82,7 @@ public static class PublishCommand
                 new SideQuestClient();
 
             Console.WriteLine(
-                "[1/4] Refreshing access token...");
+                "[1/5] Refreshing access token...");
 
             var token =
                 await client.RefreshTokenAsync(
@@ -70,7 +92,7 @@ public static class PublishCommand
                 $"OK (User: {token.UsersId})");
 
             Console.WriteLine(
-                "[2/4] Creating upload...");
+                "[2/5] Creating upload...");
 
             var upload =
                 await client.CreateUploadAsync(
@@ -81,7 +103,7 @@ public static class PublishCommand
                 $"OK (FileId: {upload.FileId})");
 
             Console.WriteLine(
-                "[3/4] Uploading APK...");
+                "[3/5] Uploading APK...");
 
             await client.UploadFileAsync(
                 upload.UploadUri,
@@ -91,22 +113,39 @@ public static class PublishCommand
             Console.WriteLine(
                 "OK");
 
-            var app =
-                await client.GetAppAsync(
+            if (versionName is not null ||
+                versionCode is not null)
+            {
+                Console.WriteLine(
+                    "[4/5] Updating app metadata...");
+
+                var app =
+                    await client.GetAppAsync(
+                        token.AccessToken,
+                        appId);
+
+                if (versionName is not null)
+                {
+                    app.Versionname =
+                        versionName;
+                }
+
+                if (versionCode.HasValue)
+                {
+                    app.Versioncode =
+                        versionCode.Value;
+                }
+
+                await client.UpdateAppAsync(
                     token.AccessToken,
-                    appId);
+                    app);
+
+                Console.WriteLine(
+                    "OK");
+            }
 
             Console.WriteLine(
-                $"{app.Name}");
-
-            Console.WriteLine(
-                $"{app.Versionname}");
-
-            Console.WriteLine(
-                $"{app.Versioncode}");
-
-            Console.WriteLine(
-                "[4/4] Associating APK with App...");
+                "[5/5] Associating APK with App...");
 
             await client.AssociateApkAsync(
                 token.AccessToken,
