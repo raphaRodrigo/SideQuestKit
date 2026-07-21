@@ -1,4 +1,6 @@
 using System.Net.Http.Json;
+using System.Net.Http.Headers;
+using System.Text.Json;
 using SideQuestKit.Core.Models;
 
 namespace SideQuestKit.Api;
@@ -54,7 +56,7 @@ public sealed class SideQuestClient
             new HttpClient();
 
         client.DefaultRequestHeaders.Authorization =
-            new System.Net.Http.Headers.AuthenticationHeaderValue(
+            new AuthenticationHeaderValue(
                 "Bearer",
                 accessToken);
 
@@ -81,14 +83,14 @@ public sealed class SideQuestClient
 
         response.EnsureSuccessStatusCode();
 
-        return System.Text.Json.JsonSerializer
+        return JsonSerializer
             .Deserialize<CreateUploadResponse>(
                 responseBody)
             ?? throw new Exception(
                 "Failed to deserialize response.");
     }
 
-    public async Task UploadFileAsync(string uploadUri, FileInfo apk)
+    public async Task UploadFileAsync(string uploadUri, string contentType, FileInfo apk)
     {
         await using var stream =
             apk.OpenRead();
@@ -97,8 +99,8 @@ public sealed class SideQuestClient
             new StreamContent(stream);
 
         content.Headers.ContentType =
-            new System.Net.Http.Headers.MediaTypeHeaderValue(
-                "application/vnd.android.package-archive");
+            new MediaTypeHeaderValue(
+                contentType);
 
         var response =
             await _httpClient.PutAsync(

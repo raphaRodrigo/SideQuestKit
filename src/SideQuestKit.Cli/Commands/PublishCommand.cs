@@ -85,6 +85,7 @@ public static class PublishCommand
 
             await client.UploadFileAsync(
                 upload.UploadUri,
+                upload.ContentType,
                 apk);
 
             Console.WriteLine(

@@ -10,4 +10,7 @@ public sealed class CreateUploadResponse
 
     [JsonPropertyName("upload_uri")]
     public string UploadUri { get; set; } = string.Empty;
+
+    [JsonPropertyName("contentType")]
+    public string ContentType { get; set; } = "";
 }
