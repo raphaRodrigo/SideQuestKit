@@ -37,8 +37,8 @@ public static class PublishCommand
         command.SetAction(async parseResult =>
         {
             var appId =
-    parseResult.GetValue(
-        appIdOption)!;
+                parseResult.GetValue(
+                    appIdOption)!;
 
             var apk =
                 parseResult.GetValue(
@@ -48,13 +48,13 @@ public static class PublishCommand
                 parseResult.GetValue(
                     refreshTokenOption)!;
 
-            //if (!apk.Exists)
-            //{
-            //    Console.Error.WriteLine(
-            //        $"APK not found: {apk.FullName}");
+            if (!apk.Exists)
+            {
+                Console.Error.WriteLine(
+                    $"APK not found: {apk.FullName}");
 
-            //    return;
-            //}
+                return;
+            }
 
             var client =
                 new SideQuestClient();
@@ -87,6 +87,17 @@ public static class PublishCommand
                 upload.UploadUri,
                 upload.ContentType,
                 apk);
+
+            Console.WriteLine(
+                "OK");
+
+            Console.WriteLine(
+                "[4/4] Associating APK with App...");
+
+            await client.AssociateApkAsync(
+                token.AccessToken,
+                appId,
+                upload);
 
             Console.WriteLine(
                 "OK");

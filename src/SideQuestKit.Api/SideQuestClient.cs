@@ -118,4 +118,50 @@ public sealed class SideQuestClient
 
         response.EnsureSuccessStatusCode();
     }
+
+    public async Task AssociateApkAsync(string accessToken, string appId, CreateUploadResponse upload)
+    {
+        var fileUrl =
+            $"https://cdn.sidequestvr.com/{upload.Path}";
+
+        var payload =
+            new
+            {
+                urls = new[]
+                {
+                    new
+                    {
+                        link_url =
+                            JsonSerializer.Serialize(
+                                new Dictionary<string, string>
+                                {
+                                    ["1"] = fileUrl
+                                }),
+
+                        provider = "APK"
+                    }
+                }
+            };
+
+        _httpClient.DefaultRequestHeaders.Authorization =
+            new AuthenticationHeaderValue(
+                "Bearer",
+                accessToken);
+
+        var response =
+            await _httpClient.PutAsJsonAsync(
+                $"v2/developers/apps/{appId}/urls",
+                payload);
+
+        Console.WriteLine(
+            $"Status Code: {(int)response.StatusCode} {response.StatusCode}");
+
+        var responseBody =
+            await response.Content.ReadAsStringAsync();
+
+        Console.WriteLine(
+            responseBody);
+
+        response.EnsureSuccessStatusCode();
+    }
 }
